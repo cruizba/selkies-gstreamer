@@ -13,6 +13,15 @@
             }
         },
         {
+            "label": "[build] build xorg-iface library",
+            "type": "shell",
+            "command": "sudo make install",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/addons/xorg-iface"
+            }
+        },
+        {
             "label": "[build] build python package",
             "type": "shell",
             "command": "python3 -m build",
@@ -44,6 +53,7 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "[build] build joystick interposer library",
+                "[build] build xorg-iface library",
                 "[build] build python package",
                 "[install] re-install python package",
                 "[run] Start selkies-gstreamer"

@@ -37,6 +37,7 @@ import struct
 import time
 from PIL import Image
 from gamepad import SelkiesGamepad
+from xorg import Xorg
 
 import logging
 logger = logging.getLogger("webrtc_input")
@@ -133,8 +134,9 @@ class WebRTCInput:
         self.on_cursor_change = lambda msg: logger.warn(
             'unhandled on_cursor_change')
 
-    def __keyboard_connect(self):
-        self.keyboard = pynput.keyboard.Controller()
+    def __xorg_connect(self):
+        display_name = self.xdisplay.get_display_name()
+        self.xorg = Xorg(display_name)
 
     def __mouse_connect(self):
         if self.uinput_mouse_socket_path:
@@ -216,7 +218,7 @@ class WebRTCInput:
         # Create connection to the X11 server provided by the DISPLAY env var.
         self.xdisplay = display.Display()
 
-        self.__keyboard_connect()
+        self.__xorg_connect()
 
         # Clear any stuck modifier keys
         self.reset_keyboard()
@@ -245,14 +247,14 @@ class WebRTCInput:
         rmeta = 65512
 
         keyf = 102
-        keyF = 70
+        # keyF = 70
 
         keym = 109
-        keyM = 77
+        # keyM = 77
 
         escape = 65307
 
-        for k in [lctrl, lshift, lalt, rctrl, rshift, ralt, lmeta, rmeta, keyf, keyF, keym, keyM, escape]:
+        for k in [lctrl, lshift, lalt, rctrl, rshift, ralt, lmeta, rmeta, keyf, keym, escape]:
             self.send_x11_keypress(k, down=False)
 
     def send_mouse(self, action, data):
@@ -320,13 +322,18 @@ class WebRTCInput:
         # With the Generic 105-key PC layout (default in Linux without a real keyboard), the key '<' is redirected to keycode 94
         # Because keycode 94 with Shift pressed is instead the key '>', the keysym for '<' should instead be redirected to ','
         # Although prevented in most cases, this fix may present issues in some keyboard layouts
-        if keysym == 60 and self.keyboard._display.keysym_to_keycode(keysym) == 94:
-            keysym = 44
-        keycode = pynput.keyboard.KeyCode(keysym)
+        # if keysym == 60 and self.keyboard._display.keysym_to_keycode(keysym) == 94:
+        #     keysym = 44
+        # keycode = pynput.keyboard.KeyCode(keysym)
+        # if down:
+        #     self.keyboard.press(keycode)
+        # else:
+        #     self.keyboard.release(keycode)
+
         if down:
-            self.keyboard.press(keycode)
+            self.xorg.key_down(keysym)
         else:
-            self.keyboard.release(keycode)
+            self.xorg.key_up(keysym)
 
     def send_x11_mouse(self, x, y, button_mask, relative=False):
         """Sends mouse events to the X server.

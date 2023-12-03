@@ -45,7 +45,11 @@ RUN sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -
         libwebp-dev \
         libvpx-dev \
         zlib1g-dev \
-        x264 && \
+        x264 \
+        libx11-6 \
+        libxrandr2 \
+        libxtst6 \
+        libxfixes3 && \
     sudo rm -rf /var/lib/apt/lists/*
 
 RUN . /etc/lsb-release; if [ "${DISTRIB_RELEASE}" \> "20.04" ]; then \
@@ -64,7 +68,11 @@ RUN sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -
         coturn \
         nginx \
         imagemagick \
-        python3-venv && \
+        python3-venv \
+        libx11-dev \
+        libxrandr-dev \
+        libxtst-dev \
+        libxfixes-dev && \
     sudo rm -rf /var/lib/apt/lists/* && \
     sudo python3 -m pip install --upgrade build
 
